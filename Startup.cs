@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using mobilsentra.Persistence;
+using AutoMapper;
+using mobilsentra.Core;
 
 namespace mobilsentra
 {
@@ -15,11 +19,22 @@ namespace mobilsentra
             Configuration = configuration;
         }
 
+      
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IVehicleRepository,VehicleRepository>();
+            services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddAutoMapper();
+            services.AddDbContext<MobilSentraDbContext>(
+                options =>
+                    options.
+                    UseNpgsql(
+                        Configuration["ConnectionStrings:Default"]                       
+                    )
+            );
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // In production, the Angular files will be served from this directory
